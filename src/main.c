@@ -19,6 +19,14 @@ const char *fragmentShaderSource =
     "    FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
     "}\0";
 
+const char *fragmentShader2Source =
+    "#version 330 core\n"
+    "out vec4 FragColor;\n"
+    "void main()\n"
+    "{\n"
+    "    FragColor = vec4(1.0f, 1.0f, 0.2f, 1.0f);\n"
+    "}\0";
+
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
   glViewport(0, 0, width, height);
 }
@@ -27,6 +35,51 @@ void processInput(GLFWwindow *window) {
   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
     glfwSetWindowShouldClose(window, 1);
   }
+}
+
+void setupShader(unsigned int *shader, const char *vertexSource,
+                 const char *fragmentSource) {
+  unsigned int vertexShader;
+  vertexShader = glCreateShader(GL_VERTEX_SHADER);
+
+  glShaderSource(vertexShader, 1, &vertexSource, NULL);
+  glCompileShader(vertexShader);
+
+  int success;
+  char infoLog[512];
+  glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+
+  if (!success) {
+    glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+    printf("ERROR::SHADER::VERTEX::COMPILATION_FAILED\n %s\n", infoLog);
+  }
+
+  unsigned int fragmentShader;
+  fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+
+  glShaderSource(fragmentShader, 1, &fragmentSource, NULL);
+  glCompileShader(fragmentShader);
+
+  if (!success) {
+    glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
+    printf("ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n %s\n", infoLog);
+  }
+
+  *shader = glCreateProgram();
+
+  glAttachShader(*shader, vertexShader);
+  glAttachShader(*shader, fragmentShader);
+  glLinkProgram(*shader);
+
+  glGetProgramiv(*shader, GL_LINK_STATUS, &success);
+  if (!success) {
+    glGetProgramInfoLog(*shader, 512, NULL, infoLog);
+    printf("ERROR::SHADER::PROGRAM::COMPILATION_FAILED\n %s\n", infoLog);
+  }
+
+  // These are not needed after linking
+  glDeleteShader(vertexShader);
+  glDeleteShader(fragmentShader);
 }
 
 int main(int argc, char *argv[]) {
@@ -60,48 +113,11 @@ int main(int argc, char *argv[]) {
   glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
   // Set up shaders
-  unsigned int vertexShader;
-  vertexShader = glCreateShader(GL_VERTEX_SHADER);
-
-  glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-  glCompileShader(vertexShader);
-
-  int success;
-  char infoLog[512];
-  glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-
-  if (!success) {
-    glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-    printf("ERROR::SHADER::VERTEX::COMPILATION_FAILED\n %s\n", infoLog);
-  }
-
-  unsigned int fragmentShader;
-  fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-
-  glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-  glCompileShader(fragmentShader);
-
-  if (!success) {
-    glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-    printf("ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n %s\n", infoLog);
-  }
-
   unsigned int shaderProgram;
-  shaderProgram = glCreateProgram();
+  setupShader(&shaderProgram, vertexShaderSource, fragmentShaderSource);
 
-  glAttachShader(shaderProgram, vertexShader);
-  glAttachShader(shaderProgram, fragmentShader);
-  glLinkProgram(shaderProgram);
-
-  glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-  if (!success) {
-    glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-    printf("ERROR::SHADER::PROGRAM::COMPILATION_FAILED\n %s\n", infoLog);
-  }
-
-  // These are not needed after linking
-  glDeleteShader(vertexShader);
-  glDeleteShader(fragmentShader);
+  unsigned int shaderProgram2;
+  setupShader(&shaderProgram2, vertexShaderSource, fragmentShader2Source);
 
   float vertices[] = {
       -0.5f,  0.5f,  0.0f, // left top
@@ -147,6 +163,7 @@ int main(int argc, char *argv[]) {
     glBindVertexArray(VAOs[0]);
     glDrawArrays(GL_TRIANGLES, 0, 3);
 
+    glUseProgram(shaderProgram2);
     glBindVertexArray(VAOs[1]);
     glDrawArrays(GL_TRIANGLES, 0, 3);
 
@@ -157,6 +174,7 @@ int main(int argc, char *argv[]) {
   glDeleteVertexArrays(2, VAOs);
   glDeleteBuffers(2, VBOs);
   glDeleteProgram(shaderProgram);
+  glDeleteProgram(shaderProgram2);
 
   glfwTerminate();
   return 0;
