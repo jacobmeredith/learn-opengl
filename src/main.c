@@ -1,31 +1,23 @@
 #include <glad.h>
 
 #include <GLFW/glfw3.h>
+#include <math.h>
 #include <stdio.h>
 
-const char *vertexShaderSource =
-    "#version 330 core\n"
-    "layout (location = 0) in vec3 aPos;\n"
-    "void main()\n"
-    "{\n"
-    "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-    "}\0";
+const char *vertexShaderSource = "#version 330 core\n"
+                                 "layout (location = 0) in vec3 aPos;\n"
+                                 "void main()\n"
+                                 "{\n"
+                                 "   gl_Position = vec4(aPos, 1.0);\n"
+                                 "}\0";
 
-const char *fragmentShaderSource =
-    "#version 330 core\n"
-    "out vec4 FragColor;\n"
-    "void main()\n"
-    "{\n"
-    "    FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-    "}\0";
-
-const char *fragmentShader2Source =
-    "#version 330 core\n"
-    "out vec4 FragColor;\n"
-    "void main()\n"
-    "{\n"
-    "    FragColor = vec4(1.0f, 1.0f, 0.2f, 1.0f);\n"
-    "}\0";
+const char *fragmentShaderSource = "#version 330 core\n"
+                                   "out vec4 FragColor;\n"
+                                   "uniform vec4 ourColor;\n"
+                                   "void main()\n"
+                                   "{\n"
+                                   "    FragColor = ourColor;\n"
+                                   "}\0";
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
   glViewport(0, 0, width, height);
@@ -116,37 +108,21 @@ int main(int argc, char *argv[]) {
   unsigned int shaderProgram;
   setup_shader(&shaderProgram, vertexShaderSource, fragmentShaderSource);
 
-  unsigned int shaderProgram2;
-  setup_shader(&shaderProgram2, vertexShaderSource, fragmentShader2Source);
-
   float vertices[] = {
-      -0.5f,  0.5f,  0.0f, // left top
-      -0.75f, -0.5f, 0.0f, // left bottom left
-      -0.25f, -0.5f, 0.0f, // left bottom right
-  };
-
-  float vertices2[] = {
-      0.5f,  0.5f,  0.0f, // left top
-      0.25f, -0.5f, 0.0f, // left bottom left
-      0.75f, -0.5f, 0.0f, // left bottom right
+      0.0f,  0.5f,  0.0f, // left top
+      -0.5f, -0.5f, 0.0f, // left bottom left
+      0.5f,  -0.5f, 0.0f, // left bottom right
   };
 
   // Setup
   unsigned int VAOs[2], VBOs[2];
-  glGenVertexArrays(2, VAOs);
-  glGenBuffers(2, VBOs);
+  glGenVertexArrays(1, VAOs);
+  glGenBuffers(1, VBOs);
 
   // First
   glBindVertexArray(VAOs[0]);
   glBindBuffer(GL_ARRAY_BUFFER, VBOs[0]);
   glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
-  glEnableVertexAttribArray(0);
-
-  // Second
-  glBindVertexArray(VAOs[1]);
-  glBindBuffer(GL_ARRAY_BUFFER, VBOs[1]);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices2), vertices2, GL_STATIC_DRAW);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
   glEnableVertexAttribArray(0);
 
@@ -160,11 +136,12 @@ int main(int argc, char *argv[]) {
 
     glUseProgram(shaderProgram);
 
-    glBindVertexArray(VAOs[0]);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    float timeValue = glfwGetTime();
+    float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
+    int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
+    glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
 
-    glUseProgram(shaderProgram2);
-    glBindVertexArray(VAOs[1]);
+    glBindVertexArray(VAOs[0]);
     glDrawArrays(GL_TRIANGLES, 0, 3);
 
     glfwSwapBuffers(window);
@@ -174,7 +151,6 @@ int main(int argc, char *argv[]) {
   glDeleteVertexArrays(2, VAOs);
   glDeleteBuffers(2, VBOs);
   glDeleteProgram(shaderProgram);
-  glDeleteProgram(shaderProgram2);
 
   glfwTerminate();
   return 0;

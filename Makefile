@@ -2,7 +2,7 @@ TARGET = bin/final
 SRC = $(wildcard src/*.c)
 OBJ = $(patsubst src/%.c, obj/%.o, $(SRC))
 CFLAGS= -Iinclude -Ideps
-LIBS = -lglfw -lGL -lX11 -lpthread -lXrandr -lXi -ldl
+LIBS = -lglfw -lGL -lX11 -lpthread -lXrandr -lXi -ldl -lm
 
 default: $(TARGET)
 
