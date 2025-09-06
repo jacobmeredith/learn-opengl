@@ -31,14 +31,14 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
   glViewport(0, 0, width, height);
 }
 
-void processInput(GLFWwindow *window) {
+void process_input(GLFWwindow *window) {
   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
     glfwSetWindowShouldClose(window, 1);
   }
 }
 
-void setupShader(unsigned int *shader, const char *vertexSource,
-                 const char *fragmentSource) {
+void setup_shader(unsigned int *shader, const char *vertexSource,
+                  const char *fragmentSource) {
   unsigned int vertexShader;
   vertexShader = glCreateShader(GL_VERTEX_SHADER);
 
@@ -114,10 +114,10 @@ int main(int argc, char *argv[]) {
 
   // Set up shaders
   unsigned int shaderProgram;
-  setupShader(&shaderProgram, vertexShaderSource, fragmentShaderSource);
+  setup_shader(&shaderProgram, vertexShaderSource, fragmentShaderSource);
 
   unsigned int shaderProgram2;
-  setupShader(&shaderProgram2, vertexShaderSource, fragmentShader2Source);
+  setup_shader(&shaderProgram2, vertexShaderSource, fragmentShader2Source);
 
   float vertices[] = {
       -0.5f,  0.5f,  0.0f, // left top
@@ -151,7 +151,7 @@ int main(int argc, char *argv[]) {
   glEnableVertexAttribArray(0);
 
   while (!glfwWindowShouldClose(window)) {
-    processInput(window);
+    process_input(window);
 
     // This sets a value in the sate machine
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
