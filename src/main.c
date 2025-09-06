@@ -68,19 +68,34 @@ int main(int argc, char *argv[]) {
     glClear(GL_COLOR_BUFFER_BIT);
 
     // rendering
+    // Triangle
+    // float vertices[] = {
+    //     // Left
+    //     -0.5f,
+    //     -0.5f,
+    //     0.0f,
+    //     // Right
+    //     0.5f,
+    //     -0.5f,
+    //     0.0f,
+    //     // Top
+    //     0.0f,
+    //     0.5f,
+    //     0.0f,
+    // };
+
+    // Quad
     float vertices[] = {
-        // Left
-        -0.5f,
-        -0.5f,
-        0.0f,
-        // Right
-        0.5f,
-        -0.5f,
-        0.0f,
-        // Top
-        0.0f,
-        0.5f,
-        0.0f,
+        0.5f,  0.5f,  0.0f, // top right
+        0.5f,  -0.5f, 0.0f, // bottom right
+        -0.5f, -0.5f, 0.0f, // bottom left
+        -0.5f, 0.5f,  0.0f  // top left
+    };
+
+    unsigned int indices[] = {
+        // note that we start from 0!
+        0, 1, 3, // first triangle
+        1, 2, 3  // second triangle
     };
 
     unsigned int VAO;
@@ -92,8 +107,14 @@ int main(int argc, char *argv[]) {
     glGenBuffers(1, &VBO);
     // OpenGL can bind several buffers at once if they are different types
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    // Copy the data into the buffer
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    unsigned int EBO;
+    glGenBuffers(1, &EBO);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices,
+                 GL_STATIC_DRAW);
 
     // Set up shaders
     unsigned int vertexShader;
@@ -146,7 +167,9 @@ int main(int argc, char *argv[]) {
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
 
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+    glBindVertexArray(0);
 
     glfwSwapBuffers(window);
     glfwPollEvents();
