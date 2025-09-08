@@ -1,4 +1,3 @@
-#include "cglm/util.h"
 #define STB_IMAGE_IMPLEMENTATION
 
 #include <glad.h>
