@@ -1,8 +1,9 @@
+#define STB_IMAGE_IMPLEMENTATION
+
 #include <glad.h>
 
 #include <GLFW/glfw3.h>
 
-#define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
 #include <stdbool.h>
@@ -101,9 +102,9 @@ int main(int argc, char *argv[]) {
   glEnableVertexAttribArray(2);
 
   // Textures
-  unsigned int texture;
-  glGenTextures(1, &texture);
-  glBindTexture(GL_TEXTURE_2D, texture);
+  unsigned int texture1;
+  glGenTextures(1, &texture1);
+  glBindTexture(GL_TEXTURE_2D, texture1);
 
   // set the texture wrapping parameters
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -112,6 +113,7 @@ int main(int argc, char *argv[]) {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
   int width, height, nrChannels;
+  stbi_set_flip_vertically_on_load(true);
   unsigned char *data = stbi_load("res/assets/textures/container.jpg", &width,
                                   &height, &nrChannels, 0);
   if (data) {
@@ -123,6 +125,31 @@ int main(int argc, char *argv[]) {
   }
   stbi_image_free(data);
 
+  unsigned int texture2;
+  glGenTextures(1, &texture2);
+  glBindTexture(GL_TEXTURE_2D, texture2);
+
+  // set the texture wrapping parameters
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+  data = stbi_load("res/assets/textures/awesomeface.png", &width, &height,
+                   &nrChannels, 0);
+  if (data) {
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA,
+                 GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+  } else {
+    printf("Failed to load texture\n");
+  }
+  stbi_image_free(data);
+
+  shader_use(shaderProgram);
+  shader_set_int(shaderProgram, "texture1", 0);
+  shader_set_int(shaderProgram, "texture2", 1);
+
   while (!glfwWindowShouldClose(window)) {
     process_input(window);
 
@@ -131,9 +158,12 @@ int main(int argc, char *argv[]) {
     // This uses the value
     glClear(GL_COLOR_BUFFER_BIT);
 
-    shader_use(shaderProgram);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture1);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, texture2);
 
-    glBindTexture(GL_TEXTURE_2D, texture);
+    shader_use(shaderProgram);
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
