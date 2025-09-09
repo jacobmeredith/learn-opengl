@@ -1,4 +1,5 @@
-#include <math.h>
+#include "cglm/cam.h"
+#include "cglm/util.h"
 #define STB_IMAGE_IMPLEMENTATION
 
 #include <glad.h>
@@ -167,27 +168,30 @@ int main(int argc, char *argv[]) {
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, texture2);
 
-    mat4 trans;
-    glm_mat4_identity(trans);
-    glm_translate(trans, (vec3){0.5f, -0.5f, 0.5f});
-    glm_rotate(trans, (float)glfwGetTime(), (vec3){0.0f, 0.0f, 1.0f});
+    mat4 model;
+    glm_mat4_identity(model);
+    glm_rotate(model, glm_rad(-55.0f), (vec3){1.0f, 0.0f, 0.0f});
+
+    mat4 view;
+    glm_mat4_identity(view);
+    glm_translate(view, (vec3){0.0f, 0.0f, -3.0f});
+
+    mat4 projection;
+    glm_perspective(glm_rad(45.0f), 800.0f / 600.0f, 0.1f, 100.0f, projection);
 
     shader_use(shaderProgram);
-    unsigned int transformLoc =
-        glGetUniformLocation(shaderProgram, "transform");
-    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, trans[0]);
+
+    unsigned int modelLocation = glGetUniformLocation(shaderProgram, "model");
+    glUniformMatrix4fv(modelLocation, 1, GL_FALSE, model[0]);
+
+    unsigned int viewLocation = glGetUniformLocation(shaderProgram, "view");
+    glUniformMatrix4fv(viewLocation, 1, GL_FALSE, view[0]);
+
+    unsigned int projectionLocation =
+        glGetUniformLocation(shaderProgram, "projection");
+    glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, projection[0]);
 
     glBindVertexArray(VAO);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
-    glm_mat4_identity(trans);
-    glm_translate(trans, (vec3){-0.5f, 0.5f, 0.0f});
-    float scaleAmount = sin(glfwGetTime());
-    glm_scale(trans, (vec3){scaleAmount, scaleAmount, scaleAmount});
-
-    transformLoc = glGetUniformLocation(shaderProgram, "transform");
-    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, trans[0]);
-
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
     glfwSwapBuffers(window);
