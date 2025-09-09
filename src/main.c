@@ -166,6 +166,19 @@ int main(int argc, char *argv[]) {
   shader_set_int(shaderProgram, "texture1", 0);
   shader_set_int(shaderProgram, "texture2", 1);
 
+  vec3 cubePositions[] = {{0.0f, 0.0f, 0.0f},
+                          {2.0f, 5.0f, -15.0f},
+                          {-1.5f, -2.2f, -2.5f},
+                          {-3.8f, -2.0f, -12.3f},
+                          {2.4f, -0.4f, -3.5f},
+                          {-1.7f, 3.0f, -7.5f},
+                          {1.3f, -2.0f, -2.5f},
+                          {1.5f, 2.0f, -2.5f},
+                          {1.5f, 0.2f, -1.5f},
+                          -1.3f,
+                          1.0f,
+                          -1.5f};
+
   while (!glfwWindowShouldClose(window)) {
     process_input(window);
 
@@ -179,10 +192,10 @@ int main(int argc, char *argv[]) {
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, texture2);
 
-    mat4 model;
-    glm_mat4_identity(model);
-    glm_rotate(model, (float)glfwGetTime() * glm_rad(50.0f),
-               (vec3){0.5f, 1.0f, 0.0f});
+    // mat4 model;
+    // glm_mat4_identity(model);
+    // glm_rotate(model, (float)glfwGetTime() * glm_rad(50.0f),
+    //            (vec3){0.5f, 1.0f, 0.0f});
 
     mat4 view;
     glm_mat4_identity(view);
@@ -193,8 +206,8 @@ int main(int argc, char *argv[]) {
 
     shader_use(shaderProgram);
 
-    unsigned int modelLocation = glGetUniformLocation(shaderProgram, "model");
-    glUniformMatrix4fv(modelLocation, 1, GL_FALSE, model[0]);
+    // unsigned int modelLocation = glGetUniformLocation(shaderProgram,
+    // "model"); glUniformMatrix4fv(modelLocation, 1, GL_FALSE, model[0]);
 
     unsigned int viewLocation = glGetUniformLocation(shaderProgram, "view");
     glUniformMatrix4fv(viewLocation, 1, GL_FALSE, view[0]);
@@ -204,7 +217,16 @@ int main(int argc, char *argv[]) {
     glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, projection[0]);
 
     glBindVertexArray(VAO);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
+    for (unsigned int i = 0; i < 10; i++) {
+      mat4 model;
+      glm_mat4_identity(model);
+      glm_translate(model, cubePositions[i]);
+      float angle = 20.0f * i;
+      glm_rotate(model, glm_rad(angle), (vec3){1.0f, 0.3f, 0.5f});
+      unsigned int modelLocation = glGetUniformLocation(shaderProgram, "model");
+      glUniformMatrix4fv(modelLocation, 1, GL_FALSE, model[0]);
+      glDrawArrays(GL_TRIANGLES, 0, 36);
+    }
 
     glfwSwapBuffers(window);
     glfwPollEvents();
