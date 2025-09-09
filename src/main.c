@@ -1,5 +1,3 @@
-#include "cglm/cam.h"
-#include "cglm/util.h"
 #define STB_IMAGE_IMPLEMENTATION
 
 #include <glad.h>
@@ -13,6 +11,8 @@
 
 #include <cglm/cglm.h>
 
+#include "cglm/cam.h"
+#include "cglm/util.h"
 #include <cglm/affine-pre.h>
 #include <cglm/mat4.h>
 #include <cglm/types.h>
@@ -182,20 +182,13 @@ int main(int argc, char *argv[]) {
   while (!glfwWindowShouldClose(window)) {
     process_input(window);
 
-    // This sets a value in the sate machine
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-    // This uses the value
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture1);
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, texture2);
-
-    // mat4 model;
-    // glm_mat4_identity(model);
-    // glm_rotate(model, (float)glfwGetTime() * glm_rad(50.0f),
-    //            (vec3){0.5f, 1.0f, 0.0f});
 
     mat4 view;
     glm_mat4_identity(view);
@@ -205,9 +198,6 @@ int main(int argc, char *argv[]) {
     glm_perspective(glm_rad(45.0f), 800.0f / 600.0f, 0.1f, 100.0f, projection);
 
     shader_use(shaderProgram);
-
-    // unsigned int modelLocation = glGetUniformLocation(shaderProgram,
-    // "model"); glUniformMatrix4fv(modelLocation, 1, GL_FALSE, model[0]);
 
     unsigned int viewLocation = glGetUniformLocation(shaderProgram, "view");
     glUniformMatrix4fv(viewLocation, 1, GL_FALSE, view[0]);
@@ -223,8 +213,10 @@ int main(int argc, char *argv[]) {
       glm_translate(model, cubePositions[i]);
       float angle = 20.0f * i;
       glm_rotate(model, glm_rad(angle), (vec3){1.0f, 0.3f, 0.5f});
+
       unsigned int modelLocation = glGetUniformLocation(shaderProgram, "model");
       glUniformMatrix4fv(modelLocation, 1, GL_FALSE, model[0]);
+
       glDrawArrays(GL_TRIANGLES, 0, 36);
     }
 
