@@ -1,3 +1,4 @@
+#include <math.h>
 #define STB_IMAGE_IMPLEMENTATION
 
 #include <glad.h>
@@ -177,6 +178,16 @@ int main(int argc, char *argv[]) {
     glUniformMatrix4fv(transformLoc, 1, GL_FALSE, trans[0]);
 
     glBindVertexArray(VAO);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+    glm_mat4_identity(trans);
+    glm_translate(trans, (vec3){-0.5f, 0.5f, 0.0f});
+    float scaleAmount = sin(glfwGetTime());
+    glm_scale(trans, (vec3){scaleAmount, scaleAmount, scaleAmount});
+
+    transformLoc = glGetUniformLocation(shaderProgram, "transform");
+    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, trans[0]);
+
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
     glfwSwapBuffers(window);
