@@ -190,9 +190,13 @@ int main(int argc, char *argv[]) {
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, texture2);
 
+    const float radius = 10.0f;
+    float camX = sin(glfwGetTime()) * radius;
+    float camZ = cos(glfwGetTime()) * radius;
+
     mat4 view;
-    glm_mat4_identity(view);
-    glm_translate(view, (vec3){0.0f, 0.0f, -3.0f});
+    glm_lookat((vec3){camX, 0.0f, camZ}, (vec3){0.0f, 0.0f, 0.0f},
+               (vec3){0.0f, 1.0f, 0.0f}, view);
 
     mat4 projection;
     glm_perspective(glm_rad(45.0f), 800.0f / 600.0f, 0.1f, 100.0f, projection);
