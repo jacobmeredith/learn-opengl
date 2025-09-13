@@ -1,6 +1,6 @@
-#include <math.h>
 #define STB_IMAGE_IMPLEMENTATION
 
+#include <math.h>
 #include <stdbool.h>
 #include <stdio.h>
 
