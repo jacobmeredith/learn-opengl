@@ -226,6 +226,7 @@ int main(void) {
     shader_set_mat4(lightingShader, "projection", projection);
     shader_set_mat4(lightingShader, "view", view);
     shader_set_vec3v(lightingShader, "lightPos", lightPos);
+    shader_set_vec3v(lightingShader, "viewPos", camera.Position);
 
     mat4 model;
     glm_mat4_identity(model);
