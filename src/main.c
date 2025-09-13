@@ -1,3 +1,4 @@
+#include <math.h>
 #define STB_IMAGE_IMPLEMENTATION
 
 #include <stdbool.h>
@@ -212,21 +213,34 @@ int main(void) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     shader_use(lightingShader);
-    shader_set_vec3(lightingShader, "objectColor", 1.0f, 0.5f, 0.31f);
+    shader_set_vec3v(lightingShader, "light.position", lightPos);
+    shader_set_vec3v(lightingShader, "viewPos", camera.Position);
 
-    shader_set_vec3(lightingShader, "lightColor", 1.0f, 1.0f, 1.0f);
+    vec3 lightColor;
+    lightColor[0] = sin(glfwGetTime() * 2.0f);
+    lightColor[1] = sin(glfwGetTime() * 0.7f);
+    lightColor[2] = sin(glfwGetTime() * 1.3f);
+
+    vec3 diffuseColor;
+    glm_vec3_mul(lightColor, (vec3){0.5f, 0.5f, 0.5f}, diffuseColor);
+    vec3 ambientColor;
+    glm_vec3_mul(diffuseColor, (vec3){0.2f, 0.2f, 0.2f}, ambientColor);
+    shader_set_vec3v(lightingShader, "light.ambient", ambientColor);
+    shader_set_vec3v(lightingShader, "light.diffuse", diffuseColor);
+    shader_set_vec3(lightingShader, "light.specular", 1.0f, 1.0f, 1.0f);
+
+    shader_set_vec3(lightingShader, "material.ambient", 1.0f, 0.5f, 0.31f);
+    shader_set_vec3(lightingShader, "material.diffuse", 1.0f, 0.5f, 0.31f);
+    shader_set_vec3(lightingShader, "material.specular", 0.5f, 0.5f, 0.5f);
+    shader_set_float(lightingShader, "material.shininess", 32.0f);
 
     mat4 projection;
     glm_perspective(glm_rad(camera.Zoom), 800.0f / 600.0f, 0.1f, 100.0f,
                     projection);
-
     mat4 view;
     camera_get_view_matrix(&camera, view);
-
     shader_set_mat4(lightingShader, "projection", projection);
     shader_set_mat4(lightingShader, "view", view);
-    shader_set_vec3v(lightingShader, "lightPos", lightPos);
-    shader_set_vec3v(lightingShader, "viewPos", camera.Position);
 
     mat4 model;
     glm_mat4_identity(model);
@@ -238,7 +252,6 @@ int main(void) {
     shader_use(lightCubeShader);
     shader_set_mat4(lightCubeShader, "projection", projection);
     shader_set_mat4(lightCubeShader, "view", view);
-
     glm_mat4_identity(model);
     glm_translate(model, lightPos);
     glm_scale(model, (vec3){0.2f, 0.2f, 0.2f});
