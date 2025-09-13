@@ -16,6 +16,7 @@ void shader_set_float(unsigned int id, const char *name, float value);
 
 void shader_set_vec3(unsigned int id, const char *name, float x, float y,
                      float z);
+void shader_set_vec3v(unsigned int id, const char *name, vec3 vec);
 
 void shader_set_mat4(unsigned int id, const char *name, mat4 mat);
 

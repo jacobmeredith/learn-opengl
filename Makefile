@@ -1,7 +1,7 @@
 TARGET = bin/final
 SRC = $(wildcard src/*.c)
 OBJ = $(patsubst src/%.c, obj/%.o, $(SRC))
-CFLAGS= -Iinclude -Ideps -g
+CFLAGS= -Iinclude -Ideps -g -Wall -Wextra
 LIBS = -lglfw -lGL -lX11 -lpthread -lXrandr -lXi -ldl -lm
 
 default: $(TARGET)
